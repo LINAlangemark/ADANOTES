@@ -1,3 +1,9 @@
 [
-  "code-styler"
+  "code-styler",
+  "obsidian-excalidraw-plugin",
+  "obsidian-latex-suite",
+  "obsidian-linter",
+  "obsidian-pandoc",
+  "pdf-plus",
+  "quick-latex"
 ]
