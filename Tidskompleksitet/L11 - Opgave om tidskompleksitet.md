@@ -2,4 +2,3 @@
 
 Konstanter medtages ikke og siden
 log(N^k) => k* log(N), er eksponenten en konstant og ligegyldig
-
