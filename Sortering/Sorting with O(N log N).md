@@ -1,0 +1,5 @@
+**MERGESORT**
+
+**HEAPSORT**
+
+**QUICKSORT**
