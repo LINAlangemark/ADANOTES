@@ -6,6 +6,7 @@ gennemgå evt rekurrensligninger
 snak om forskellige typer af sorting/hvornår de bruges/forskellene
 ubalancer og rotationer
 induktionsbeviser
+grafer --> tæthed?
 
 final exercises?
 lave eksamenssæt og snak om delelementer i fællesskab --> kom ind på ovenstående emner?
