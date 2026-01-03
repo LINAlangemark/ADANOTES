@@ -2,6 +2,42 @@
 #include "graph.h"
 
 int main() {
+
+    std::cout << "----------------- GRAPH FROM P2: EXERCISE 5 -----------------\n";
+
+    Graph g(12, GraphType::ADJACENCY_LIST, false);
+
+    
+    g.addEdge('b', 'c', 8);
+    g.addEdge('c', 'd', 7);
+    
+    g.addEdge('b', 'a', 4);
+    g.addEdge('b', 'h', 11);
+    g.addEdge('c', 'i', 2);
+    g.addEdge('c', 'f', 4);
+    g.addEdge('d', 'f', 14);
+    g.addEdge('d', 'e', 9);
+
+    g.addEdge('a', 'h', 8);
+    g.addEdge('i', 'h', 7);
+    g.addEdge('i', 'g', 6);
+    g.addEdge('e', 'f', 10);
+
+    g.addEdge('h', 'g', 1);
+    g.addEdge('g', 'f', 2);
+    
+    g.print();
+
+    std::cout << "\n----------------- DIJKSTRA (start = 0) -----------------\n";
+    g.dijkstra(0);
+
+    std::cout << "\n----------------- PRIM -----------------\n";
+    g.prim();
+
+    std::cout << "\n----------------- KRUSKAL -----------------\n";
+    g.kruskal();
+
+    /*
     std::cout<<"----------------- ADJACENCY LIST GRAPH -----------------"<<std::endl;
     Graph gl(5, GraphType::ADJACENCY_LIST, true);
 
@@ -108,7 +144,7 @@ int main() {
     std::cout << "\n----------------- DIJKSTRA FRA A -----------------\n";
     gd.dijkstra(0);  // Start fra A
 
-
+    */
     return 0;
     
 }
