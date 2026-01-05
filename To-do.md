@@ -1,13 +1,14 @@
-HUSK:
-	se på om jeg har nok plads på ubuntu
-	kig på brug af ny exam monitor
+ HUSK:
+	**kig på brug af ny exam monitor**
 	slå alt fra der er syncet/online
-	gennemse alle kode eksempler og sørg for det er muligt/nemt at kære/compile
+	**gennemse alle kode eksempler og sørg for det er muligt/nemt at kære/compile**
 	lave eksamenstemplate?
+	rydde op i noter
 	
 Tilføj til noter:
-	rekurrens 
-	induktionsbeviser
+	**rekurrens** 
+	**induktionsbeviser**
+
 	schedulering
 	dynamisk programmering
 	bin-packing
@@ -24,6 +25,6 @@ I plenum:
 
 
 Opgavesæt:
-	eksamenssæt
+	kig på binary search tree
 	reekeksamenssæt
 	kig på aktivitetsplanlægning?
