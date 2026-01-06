@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from collections import deque
 import math
 
-#A, B, C, D, E, F, G, H, I, J, K, L = range(12)
+A, B, C, D, E, F, G, H, I, J, K, L = range(12)
 a, b, c, d, e, f, g, h, i, j, k, l = range(12)
 def dijkstra_table(graph, start):
     # Initialisering
@@ -330,6 +330,59 @@ def mst_edges_to_graph(mst_edges):
     for u, v, w in mst_edges:
         G.add_edge(u, v, value=w)
     return G
+def dijkstra_print_markdown(graph, start, labels=None):
+    """
+    Prints Dijkstra output as Markdown tables:
+    - Full Dijkstra table
+    - Shortest paths from start node
+    """
+    table = dijkstra_table(graph, start)
+
+    def label(n):
+        return labels[n] if labels else n
+
+    # --- Full table ---
+    print("\n### Fuld Dijkstra-tabel\n")
+    print("| v | known | dv | pv |")
+    print("|---|:-----:|---:|---|")
+    for row in table:
+        pv_label = label(row['pv']) if row['pv'] is not None else "-"
+        print(f"| {label(row['v'])} | {row['known']} | {row['dv']} | {pv_label} |")
+
+    # --- Shortest paths ---
+    print("\n### Korteste stier fra start-node\n")
+    print("| v | dv | sti |")
+    print("|---|---:|-----|")
+
+    # Reconstruct paths
+    nodes = list(graph.nodes())
+    known = {n: False for n in nodes}
+    dv = {n: math.inf for n in nodes}
+    pv = {n: None for n in nodes}
+    dv[start] = 0
+
+    while not all(known.values()):
+        unvisited = {n: dv[n] for n in nodes if not known[n]}
+        u = min(unvisited, key=unvisited.get)
+        known[u] = True
+        for v in graph.neighbors(u):
+            if not known[v]:
+                w = graph[u][v]['value']
+                if dv[u] + w < dv[v]:
+                    dv[v] = dv[u] + w
+                    pv[v] = u
+
+    for n in sorted(nodes):
+        if dv[n] < math.inf:
+            path = []
+            current = n
+            while current is not None:
+                path.append(label(current))
+                current = pv[current]
+            path = list(reversed(path))
+            print(f"| {label(n)} | {dv[n]} | {' -> '.join(path)} |")
+        else:
+            print(f"| {label(n)} | ∞ | Ingen sti |")
 
 def run_graph(graph_data, start_node=0, mst_algorithm="kruskal"):
     print("=" * 45)
@@ -340,33 +393,88 @@ def run_graph(graph_data, start_node=0, mst_algorithm="kruskal"):
         directed=graph_data.get("directed", False)
     )
     # Get graph properties
+    """
     props = graph_properties(G)
     print("Graph properties:")
     for k, v in props.items():
         print(f"\t{k}: {v}")
+    """
     label_data = graph_data.get("labels", "num")
     # If labels is already a dict, use it; otherwise generate labels
     if isinstance(label_data, dict):
         labels = label_data
     else:
         labels = generate_labels(G.nodes(), label_data)
-    plot_graph(G, labels)
+    props = graph_properties(G)
 
+    print("\nGrafens egenskaber:")
+    # 1. Rettet eller urettet
+    if G.is_directed():
+        print(f"- Grafen er rettet: Kanter har retning")
+    else:
+        print(f"- Grafen er urettet: Kanter har ingen retning")
+
+    # 2. Vægtet eller ej
+    if props['vægtet']:
+        print("- Grafen er vægtet: Kanterne har tilknyttede værdier")
+    else:
+        print("- Grafen er ikke vægtet: Alle kanter behandles ens")
+    # 3. Forbindelser
+    def ja_nej(value):
+        return "ja" if value else "nej"
+    if G.is_directed():
+        print(f"- Grafen er stærkt forbundet: {ja_nej(props['stærkt_forbundet'])} (Kan alle nå alle via kanter i pilens retning?)")
+        print(f"- Grafen er svagt forbundet: {ja_nej(props['svagt_forbundet'])} (Kan alle nå alle, hvis man ignorerer retninger?)")
+    else:
+        print(f"- Grafen er forbundet: {ja_nej(props['forbundet'])} (Kan alle noder nås fra hinanden via kanter?)")
+
+    # 4. Tæthed
+    print(f"- Grafens tæthed: {props['tæthed']:.2f} ({props['klassifikation_tæthed']})")
+    print("  - Tæthed = hvor mange af de mulige kanter, der rent faktisk findes i grafen")
+
+    # 5. Antal noder og kanter
+    print(f"- Antal noder: {props['antal_noder']} (Hvor mange punkter/grafer der er)")
+    print(f"- Antal kanter: {props['antal_kanter']} (Hvor mange forbindelser der findes mellem noder)")
+    print("\n")
     # ----- TOPOLOGICAL SORT -----
     if G.is_directed():
         try:
             topo = topological_sort(G)
             print("Topologisk sortering:")
             print([labels[n] for n in topo])
+            print("Grafen er rettet og indeholder ingen cyklusser, derfor kan noderne ordnes i topologisk rækkefølge.")
         except ValueError as e:
             print(e)
-
+    else:
+        print("Topologisk sortering er ikke muligt, da grafen er retningsløg.")
+    if not G.is_directed():
+        if not props['forbundet']:
+            print("\nMST kan ikke beregnes: Grafen er urettet men ikke forbundet.")
+            print("Alle noder skal kunne nås fra hinanden for at en MST kan eksistere.")
+        else:
+            print(f"\nMST kan beregnes med både Prim og Kruskal (Grafen er urettet og forbundet).")
+    else:
+        print("\nMST kan ikke beregnes: Grafen er rettet. MST gælder kun for urettede grafer.")
     # ----- DIJKSTRA -----
+    # Check om Dijkstra giver mening
+    if not G.is_directed():
+        if not props['forbundet']:
+            print("\nDijkstra kan ikke udføres: Grafen er ikke forbundet. Ikke alle noder kan nås fra hinanden.")
+        elif any(d < 0 for u, v, d in G.edges(data='value')):
+            print("\nDijkstra kan ikke udføres: Grafen indeholder negative kantværdier, hvilket Dijkstra ikke håndterer.")
+        else:
+            print("\nDijkstra kan udføres: Grafen er urettet, forbundet og har ingen negative kanter. Dog afhænger relevansen af start noden.")
+    else:  # Rettet graf
+        if any(d < 0 for u, v, d in G.edges(data='value')):
+            print("\nDijkstra kan ikke udføres: Grafen indeholder negative kantværdier.")
+        else:
+            print("\nDijkstra kan udføres: Grafen er rettet og har ingen negative kanter. Dog afhænger relevansen af start noden.")
+
     dijkstra_shortest_paths(G, start_node, labels)
+    dijkstra_print_markdown(G, start_node, labels)
 
     # ----- MST -----
     if not G.is_directed():
-
         if mst_algorithm.lower() == "prim":
             mst_edges, total = prim_mst_ordered(graph_data["edges"], start_node)
 
@@ -376,6 +484,7 @@ def run_graph(graph_data, start_node=0, mst_algorithm="kruskal"):
 
             # 🔹 plot Prim MST
             mst_G = mst_edges_to_graph(mst_edges)
+            plot_graph(G, labels)
             plot_graph(mst_G, labels)
 
         else:  # Kruskal
@@ -389,7 +498,11 @@ def run_graph(graph_data, start_node=0, mst_algorithm="kruskal"):
 
             # 🔹 plot Kruskal MST
             mst_G = mst_edges_to_graph(mst_edges)
+            plot_graph(G, labels)
             plot_graph(mst_G, labels)
+    else:
+        plot_graph(G, labels)
+
 """
 edges = [
     (0,1,1), (0,4,1), (0,5,2), (1,2,8), (0,2,6),
@@ -472,86 +585,53 @@ run_graph({
     mst_algorithm="prim"
 )
 
-# Definér noder som tal 0..9
-F, A, B, C, D, E, G, H, I, J = range(10)
-
-# Kanter: (fra, til, vægt)
-edges = [
-    (F, E, 4),
-    (E, D, 1),
-    (D, B, 9),
-    (B, C, 7),
-    (C, H, 5),
-    (H, I, 7),
-    (I, D, 2),
-    (B, A, 1),
-    (A, C, 1),
-    (A, I, 4),
-    (I, J, 3),
-    (J, G, 10),
-]
-
-# Labels til udskrift
-labels = {
-    A: "A",
-    B: "B",
-    C: "C",
-    D: "D",
-    E: "E",
-    F: "F",
-    G: "G",
-    H: "H",
-    I: "I",
-    J: "J",
-}
-
-graph = build_graph(edges, directed=True)
-
-# Start i node F
-dijkstra_shortest_paths(graph, F, labels)
-
+edges = [(A,B,3),(A,D,4),(A,E,4),(B,C,10),(B,E,2),(B,F,3),(C,F,6),(C,G,1),(D,E,5),(D,H,6),(E,F,11),(E,H,2),(E,I,1),(F,G,2),(F,I,3),(F,J,11),(G,J,8),(H,I,4),(I,J,7)]
 run_graph({
     "directed": False,
     "edges": edges,
-    "labels": labels
+    "labels": 'ABC'
     },
     start_node=A,
     mst_algorithm="prim"
 )
+
+edges = [(F,E,4),(E,D,1),(D,B,9),(B,A,1),(B,C,7),(A,C,1),(A,I,4),(C,H,5),(H,I,7),(I,D,2),(I,J,5),(J,G,10)]
+run_graph({
+    "directed": False,
+    "edges": edges,
+    "labels": 'ABC'
+    },
+    start_node=F,
+    mst_algorithm="kruskal"
+)
 """
-
-# Definér noder som tal 0..9
-F, A, B, C, D, E, G, H, I, J = range(10)
-
-# Kanter: (fra, til, vægt)
-edges = [
-    (B, A, 10),
-    (E, A, 7),
-    (A, D, 60),
-    (A, C, 12),
-    (C, B, 20),
-    (C, D, 32)
-]
-
-# Labels til udskrift
-labels = {
-    A: "A",
-    B: "B",
-    C: "C",
-    D: "D",
-    E: "E",
-}
-
-graph = build_graph(edges, directed=True)
-
-# Start i node F
-dijkstra_shortest_paths(graph, E, labels)
+edges1 = [(A,C,12,),(A,D,60),(B,A,10),(C,B,20),(C,D,32),(E,A,7)] # Directed
+edges2 = [(0,1,3),(0,3,7),(0,4,8),(1,2,1),(1,3,4),(3,2,2),(4,3,3)] # Directed
+edges3 = [(0,2,0.26),(0,4,0.38),(0,6,0.58),(0,7,0.16),(1,2,0.36),(1,3,0.29),(1,5,0.32),(1,7,0.19),(2,3,0.17),(2,6,0.40),(2,7,0.34),(3,6,0.52),(4,5,0.35),(4,6,0.93),(4,7,0.37),(5,7,0.28)] # Undirected
 
 run_graph({
     "directed": True,
-    "edges": edges,
-    "labels": labels
+    "edges": edges1,
+    "labels": 'ABC'
+    },
+    start_node=E,
+    mst_algorithm="kruskal"
+)
+
+run_graph({
+    "directed": True,
+    "edges": edges2,
+    "labels": 'num'
     },
     start_node=A,
-    mst_algorithm="prim"
+    mst_algorithm="kruskal"
 )
+run_graph({
+    "directed": False,
+    "edges": edges3,
+    "labels": 'num'
+    },
+    start_node=A,
+    mst_algorithm="kruskal"
+)
+

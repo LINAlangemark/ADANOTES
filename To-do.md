@@ -1,30 +1,15 @@
  HUSK:
-	**kig på brug af ny exam monitor**
-	slå alt fra der er syncet/online
-	**gennemse alle kode eksempler og sørg for det er muligt/nemt at kære/compile**
-	lave eksamenstemplate?
-	rydde op i noter
+	**kig på brug af ny exam monitor [igen]**
+	Fjern git mapp? og slå alt fra der er syncet/online
+	lave eksamenstemplate
 	
-Tilføj til noter:
-	**rekurrens** 
-	**induktionsbeviser**
 
+evt lave opgave om critical path eller leed code opgaver
+se videoer omba
+
+manglende noter:
 	schedulering
 	dynamisk programmering
 	bin-packing
 	hufmann koder
 
-
-I plenum:
-	klassifering af træer (og deres egenskaber)
-	snak om tidskompleksitets løsninger
-	gennemgå evt rekurrensligninger
-	snak om forskellige typer af sorting/hvornår de bruges/forskellene
-	ubalancer og rotationer
-	induktionsbeviser
-
-
-Opgavesæt:
-	kig på binary search tree
-	reekeksamenssæt
-	kig på aktivitetsplanlægning?

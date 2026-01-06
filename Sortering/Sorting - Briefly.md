@@ -14,6 +14,8 @@ Take a look at this list of integers:  34, 8, 64, 51, 32, 21
 	(34,8) (34,32) (34,21) (64,51) (64,32) (64,21) (51,32) (51,21) (32,21)
 
 ![[Pasted image 20251220100614.png]]
+Sorteringslagoritmer tid- og rum-kompleksiteter
+![[Pasted image 20260105163738.png]]
 
 **EKSEMPEL MED:** data = {5, 2, 9, 1, 5, 6};
 
