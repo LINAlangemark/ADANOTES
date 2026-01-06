@@ -1,4 +1,4 @@
-[[Rekurrens]]
+[[Rekurrens_noter]]
 ![[Pasted image 20260105112851.png]]
 
 
